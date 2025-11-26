@@ -16,7 +16,7 @@ Import package [COCO Java Extensions for XSLT.zip](.//COCO%20Java%20Extensions%2
 Iflow that shows how call custom Java code from XSLT. 
 
 ### 2. COCO - SDK extension for XSLT
-_(in process)_ A groovy script that will generate java wrappers that can be used from XSLT to do:
+_(in process)_ A Groovy Script Collection that will generate java wrappers that can be used from XSLT to do:
    - Value Mapping
    - Retrieve Partner Directory parameters
    - Write custom headers
