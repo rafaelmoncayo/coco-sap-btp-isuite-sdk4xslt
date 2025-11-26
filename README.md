@@ -10,7 +10,7 @@ Besides you can call java classes from XSLT doing it at SAP Cloud Integration of
 What if we use a class that inherits or implements a class or interface of Java SDK and put it as a property in the integration flow? For example java.util.Map. Map has two generic methods: get(value) and put(key,value) that look generic enough for many scenarios. So if we wrap our java logic in a class that implements Map... Eureka! our custom code could be called from an XSLT program.
 
 ## What to find in this package
-Import package [COCO Java Extensions for XSLT.zip](./COCO Java Extensions for XSLT.zip) into your Cloud Integration subaccount and you will be availabe to see:
+Import package [COCO Java Extensions for XSLT.zip](.//COCO%20Java%20Extensions%20for%20XSLT.zip) into your Cloud Integration subaccount and you will be availabe to see:
 
 ### 1. COCO Call custom java from XSLT sample 
 Iflow that shows how call custom Java code from XSLT. 
