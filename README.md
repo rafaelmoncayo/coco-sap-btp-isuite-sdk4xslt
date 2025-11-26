@@ -1,7 +1,7 @@
 # COCO - Cloud Integration SDK extension for XSLT
 This is a package for SAP Cloud Integration that enables the call of some **SDK functionalities of Cloud Integration from XSLT**. And also provides you a sample of how to call **custom Java code** from XSLT.
 
-## Brief Description
+## Brief description of the challenge
 Java classes/mehtods can be called from Saxon XSLT processor EE. You can look at Saxonica documentation [Writing reflexive extension functions in Java](https://www.saxonica.com/html/documentation10/extensibility/functions/index.html).
 
 Besides you can call java classes from XSLT doing it at SAP Cloud Integration offers an additional challenge. When Saxon compiles an XSLT program, it does reflextion but it just have visibility to Java SDK classes, no to custom code neither Cloud Integration SDK API like com.sap.it.api.mapping.ValueMappingApi. If you import jars in the Integration Flow or at a Script Collection, Saxon will not be aware of your custom code neither used external libraries when it compiles your XSLT.
