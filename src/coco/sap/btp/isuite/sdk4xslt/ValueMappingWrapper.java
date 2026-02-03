@@ -118,16 +118,11 @@ public class ValueMappingWrapper extends Sdk4XsltAbstract implements Map<Object,
 	}
 
 	/**
-	 * Do value mapping or creates a new binded instance of ValueMappingWrapper. Depending on the number of values passed the behavior will be:
+	 * Do value mapping of creates a new binded instance of ValueMappingWrapper.
+	 * <p>
+	 * If this instance is <strong>not binded</strong> to source|target-agency|identifier
+	 * then depending on the number of values passed the behavior will be:
 	 * <ul>
-	 *  <li><strong>Case one value passed</strong>: returns the mapped value of key if this 
-	 *      instance is binded to source|target-agencie|identifier. Otherwise,
-	 *      returns an error message. e.g.
-	 *      <pre>
-	 *      {@code <xsl:value-of select="map:get($vmUOM, UnitOfMeasure)" />}
-	 *      returns "piece" if UnitOfMeasure equals "PCE"
-	 *      </pre>
-	 *  </li>
 	 *  <li><strong>Case 4 values passed</strong>: returns a new binded instance of 
 	 *      ValueMappingWrapper the four values will represent: sourceAgency, 
 	 *      sourceIdentifier, targetAgency, targetIdentifier. e.g.
@@ -146,8 +141,23 @@ public class ValueMappingWrapper extends Sdk4XsltAbstract implements Map<Object,
 	 *  </li> 
 	 *  <li><strong>Other number of values passed</strong>: Returns an error message.</li>
 	 * </ul>
-	 *   
-	 */
+	 * <p>
+	 * If this instance is binded. Then it will return the mapped value of key. If key is a sequence, then it will return a sequence of each value contained in the sequence.
+	 * <ul>
+	 *  <li><strong>Case one value passed</strong>: returns the mapped value of key. e.g.
+	 *      <pre>
+	 *      {@code <xsl:value-of select="map:get($vmUOM, UnitOfMeasure)" />}
+	 *      returns "piece" if UnitOfMeasure equals "PCE"
+	 *      </pre>
+	 *  </li>
+	 *  <li><strong>A sequence of values passed</strong>: For every source value in sequence return the mapped value 
+	 *      <pre>
+	 *      {@code <xsl:value-of select="map:get($vmUOM, ('PCE', 'KGM', 'BX'))" separator="," />" />}
+	 *      returns "piece,kg,box"
+	 *      </pre>
+	 *  </li>
+	 *  </ul>
+	 *   	 */
 	@Override
 	public Object get(Object key) {
 		Object value = null;
@@ -161,29 +171,46 @@ public class ValueMappingWrapper extends Sdk4XsltAbstract implements Map<Object,
 					args.add(stringValue(p));
 				}
 				
-				switch (args.size()) {
-				case 1:
-					if (hasAgenciesAndIdentifiers()) {
-						value = mappingApi.getMappedValue(srcAgency, srcIdentifier, stringValue(key), trgAgency, trgIdentifier);
+				if (hasAgenciesAndIdentifiers()) {
+					// This instance is already binded to source and target agencies and identifiers
+					if (args.size()==1) {
+						value = mappingApi.getMappedValue(
+								srcAgency, 
+								srcIdentifier, 
+								stringValue(args.get(0)), 
+								trgAgency, 
+								trgIdentifier);
+					} else if (args.size() > 1) {
+						ArrayList<String> results = new ArrayList<String>(args.size());
+						for (String arg: args) {
+							results.add(mappingApi.getMappedValue(srcAgency, 
+									srcIdentifier, 
+									stringValue(arg), 
+									trgAgency, 
+									trgIdentifier));
+						}
+						value = results;
 					} else {
-						value = String.format(ERROR_MSG_NOTBINDED_SEQ1);				
+						value = String.format(ERROR_MSG_WRONGNUMBEROFPARAMS, args.size());
 					}
-					break;
-				case 4:
-					// Create an instance of ValueMappingWrapper with schemas and identifiers
-					value = new ValueMappingWrapper(args.get(0), args.get(1), args.get(2), args.get(3));
-					break;
-				case 5:
-					// Do value mapping
-					value = mappingApi.getMappedValue(
-							args.get(0),  // source agency 
-							args.get(1),  // source identifier
-							args.get(2),  // source value
-							args.get(3),  // target agency
-							args.get(4)); // target identifier 
-					break;
-				default:
-					value = String.format(ERROR_MSG_WRONGNUMBEROFPARAMS, args.size());				
+				} else {
+					switch (args.size()) {
+					case 4:
+						// Create an instance of ValueMappingWrapper with schemas and identifiers
+						value = new ValueMappingWrapper(args.get(0), args.get(1), args.get(2), args.get(3));
+						break;
+					case 5:
+						// Do value mapping
+						value = mappingApi.getMappedValue(
+								args.get(0),  // source agency 
+								args.get(1),  // source identifier
+								args.get(2),  // source value
+								args.get(3),  // target agency
+								args.get(4)); // target identifier 
+						break;
+					default:
+						value = String.format(ERROR_MSG_WRONGNUMBEROFPARAMS, args.size());				
+					}					
 				}
 			} else if (hasAgenciesAndIdentifiers()) {
 				value = mappingApi.getMappedValue(srcAgency, srcIdentifier, stringValue(key), trgAgency, trgIdentifier);
